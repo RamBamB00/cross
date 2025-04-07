@@ -28,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   static final List<Widget> _pages = [
-    const HomeScreen(),
+    const BlackjackScreen(),
     const AboutPage(),
   ];
 
@@ -44,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.casino), label: 'Play'),
           BottomNavigationBarItem(icon: Icon(Icons.info), label: 'About'),
         ],
         currentIndex: _selectedIndex,
@@ -55,113 +55,154 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  String _displayText = '';
-  Color _backgroundColor = Colors.white;
-  Color _textColor = Colors.black;
-
-  void _addText() {
-    setState(() {
-      _displayText = 'Hello, Flutter!';
-    });
-  }
-
-  void _removeText() {
-    setState(() {
-      _displayText = '';
-    });
-  }
-
-  void _changeBackgroundColor() {
-    setState(() {
-      _backgroundColor = _backgroundColor == Colors.white
-          ? Colors.lightBlueAccent
-          : Colors.white;
-    });
-  }
-
-  void _toggleTextColor() {
-    setState(() {
-      _textColor = _textColor == Colors.black ? Colors.red : Colors.black;
-    });
-  }
-
-  void _showAlertDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Alert'),
-          content: const Text('This is a sample alert message.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+class BlackjackScreen extends StatelessWidget {
+  const BlackjackScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Flutter Blackjack')),
-      backgroundColor: _backgroundColor,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Card(
-              elevation: 5,
-              color: Colors.white,
-              margin: const EdgeInsets.all(16),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  _displayText,
-                  style: TextStyle(fontSize: 24, color: _textColor),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
+      appBar: AppBar(title: const Text('Blackjack Table')),
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          final isPortrait = orientation == Orientation.portrait;
+          final layout = _buildGameLayout();
 
-            _buildButton('Add Text', _addText),
-            _buildButton('Remove Text', _removeText),
-            _buildButton('Change Background', _changeBackgroundColor),
-            _buildButton('Toggle Text Color', _toggleTextColor),
-            _buildButton('Show Alert', _showAlertDialog),
-          ],
-        ),
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: isPortrait
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: layout,
+                    )
+                  : Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  layout[0], // Dealer
+                                  const SizedBox(height: 20),
+                                  layout[1], // Status
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  layout[2], // Player
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                        layout[3], // Controls
+                      ],
+                    ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildButton(String text, VoidCallback onPressed) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueAccent,
-          foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 50),
-        ),
-        onPressed: onPressed,
-        child: Text(text, style: const TextStyle(fontSize: 18)),
+  List<Widget> _buildGameLayout() {
+    final playerCards = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const [
+        CardWidget(cardText: '🂡'),
+        SizedBox(width: 10),
+        CardWidget(cardText: '🂱'),
+      ],
+    );
+
+    final dealerCards = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const [
+        CardWidget(cardText: '🂠'),
+        SizedBox(width: 10),
+        CardWidget(cardText: '🂡'),
+      ],
+    );
+
+    final controls = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Wrap(
+        spacing: 10,
+        alignment: WrapAlignment.center,
+        children: [
+          ElevatedButton(onPressed: () {}, child: const Text('Hit')),
+          ElevatedButton(onPressed: () {}, child: const Text('Stand')),
+          ElevatedButton(onPressed: () {}, child: const Text('Double')),
+          ElevatedButton(onPressed: () {}, child: const Text('Restart')),
+        ],
+      ),
+    );
+
+    final statusBar = const Center(
+      child: Text(
+        'Your Turn!',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+    );
+
+    return [
+      ExpandedSection(title: 'Dealer', child: dealerCards),
+      statusBar,
+      ExpandedSection(title: 'Player', child: playerCards),
+      controls,
+    ];
+  }
+}
+
+class CardWidget extends StatelessWidget {
+  final String cardText;
+  const CardWidget({super.key, required this.cardText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 60,
+      height: 90,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: const [BoxShadow(color: Colors.grey, blurRadius: 4)],
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        cardText,
+        style: const TextStyle(fontSize: 32),
       ),
     );
   }
 }
 
-// About Page
+class ExpandedSection extends StatelessWidget {
+  final String title;
+  final Widget child;
+  const ExpandedSection({super.key, required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(title,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        child,
+      ],
+    );
+  }
+}
+
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
@@ -169,49 +210,50 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('About the Game')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
+          children: const [
+            Text(
               '🎲 Flutter Blackjack Game 🎲',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+              style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent),
             ),
-            const SizedBox(height: 10),
-            const Text(
-              'This is a simple Flutter-based Blackjack game where players can enjoy the classic card game experience. '
-              'The game follows standard Blackjack rules without any betting, providing a risk-free and fun way to play.\n\n'
-              'The objective is to get as close to a total of 21 as possible without exceeding it. '
-              'Players can compete against the dealer, and the game offers an interactive and user-friendly interface for all ages.',
+            SizedBox(height: 10),
+            Text(
+              'This is a simple Flutter-based Blackjack game where players can enjoy the classic card game experience.',
               style: TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20),
+            Text(
               '👨‍💻 Developers:',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 5),
-            const Text(
-              '• Daniil Naumenko\n'
-              '• Ramazan Abytaiev\n\n'
-              ,
+            SizedBox(height: 5),
+            Text(
+              '• Daniil Naumenko\n• Ramazan Abytaiev\n',
               style: TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20),
+            Text(
               '📌 Mentor:',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const Text(
-              'Assistant Professor Abzal Kyzyrkanov',
+            Text(
+              'Professor Abzal Kyzyrkanov',
               style: TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: 30),
             Center(
               child: Text(
                 '🎮 Enjoy your game! 🎮',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green),
               ),
             ),
           ],
@@ -220,4 +262,3 @@ class AboutPage extends StatelessWidget {
     );
   }
 }
-
