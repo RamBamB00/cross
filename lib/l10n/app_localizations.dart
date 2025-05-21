@@ -103,13 +103,13 @@ abstract class AppLocalizations {
   /// No description provided for @bust.
   ///
   /// In en, this message translates to:
-  /// **'Bust!'**
+  /// **'Bust! You lose!'**
   String get bust;
 
   /// No description provided for @dealerBusts.
   ///
   /// In en, this message translates to:
-  /// **'Dealer busts!'**
+  /// **'Dealer busts! You win!'**
   String get dealerBusts;
 
   /// No description provided for @dealerWins.
@@ -127,25 +127,25 @@ abstract class AppLocalizations {
   /// No description provided for @push.
   ///
   /// In en, this message translates to:
-  /// **'Push!'**
+  /// **'Push! It\'s a tie!'**
   String get push;
 
   /// No description provided for @dealerHand.
   ///
   /// In en, this message translates to:
-  /// **'Dealer\'s hand'**
+  /// **'Dealer\'s Hand'**
   String get dealerHand;
 
   /// No description provided for @yourHand.
   ///
   /// In en, this message translates to:
-  /// **'Your hand'**
+  /// **'Your Hand'**
   String get yourHand;
 
   /// No description provided for @yourValue.
   ///
   /// In en, this message translates to:
-  /// **'Your value'**
+  /// **'Your Value'**
   String get yourValue;
 
   /// No description provided for @hit.
@@ -169,7 +169,7 @@ abstract class AppLocalizations {
   /// No description provided for @guestMode.
   ///
   /// In en, this message translates to:
-  /// **'Guest Mode'**
+  /// **'Continue as Guest'**
   String get guestMode;
 
   /// No description provided for @guestModeSettingsDisabled.
@@ -199,7 +199,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Blackjack'**
+  /// **'Blackjack App'**
   String get appTitle;
 
   /// No description provided for @aboutGame.
@@ -250,6 +250,24 @@ abstract class AppLocalizations {
   /// **'Theme'**
   String get theme;
 
+  /// No description provided for @systemTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get systemTheme;
+
+  /// No description provided for @lightTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get lightTheme;
+
+  /// No description provided for @darkTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get darkTheme;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:
@@ -279,6 +297,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign Out'**
   String get signOut;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get welcomeBack;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @continueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Guest'**
+  String get continueAsGuest;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @needAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Need an account?'**
+  String get needAccount;
+
+  /// No description provided for @pleaseEnterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email'**
+  String get pleaseEnterEmail;
+
+  /// No description provided for @pleaseEnterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password'**
+  String get pleaseEnterPassword;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordTooShort;
+
+  /// No description provided for @gameHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Game History'**
+  String get gameHistory;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @loggedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged in as:'**
+  String get loggedInAs;
+
+  /// No description provided for @offlineMode.
+  ///
+  /// In en, this message translates to:
+  /// **'You are in offline mode'**
+  String get offlineMode;
+
+  /// No description provided for @searchHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Search history...'**
+  String get searchHistory;
+
+  /// No description provided for @dateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Range'**
+  String get dateRange;
+
+  /// No description provided for @result.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get result;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @win.
+  ///
+  /// In en, this message translates to:
+  /// **'Win'**
+  String get win;
+
+  /// No description provided for @lose.
+  ///
+  /// In en, this message translates to:
+  /// **'Lose'**
+  String get lose;
+
+  /// No description provided for @tie.
+  ///
+  /// In en, this message translates to:
+  /// **'Tie'**
+  String get tie;
+
+  /// No description provided for @noGamesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No games found'**
+  String get noGamesFound;
+
+  /// No description provided for @playerScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Player Score'**
+  String get playerScore;
+
+  /// No description provided for @dealerScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Dealer Score'**
+  String get dealerScore;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// No description provided for @selectDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date Range'**
+  String get selectDateRange;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get endDate;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @pleaseSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in to view game history'**
+  String get pleaseSignIn;
+
+  /// No description provided for @gameOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Game on'**
+  String get gameOn;
 }
 
 class _AppLocalizationsDelegate

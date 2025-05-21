@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cross/providers/theme_provider.dart';
-import 'package:cross/providers/language_provider.dart';
-import 'package:cross/providers/auth_provider.dart';
-import 'package:cross/l10n/app_localizations.dart';
+import '../providers/theme_provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/language_provider.dart';
+import '../l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -11,8 +11,8 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final languageProvider = Provider.of<LanguageProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -23,23 +23,38 @@ class SettingsScreen extends StatelessWidget {
         children: [
           ListTile(
             title: Text(l10n.theme),
-            trailing: Switch(
-              value: themeProvider.isDarkMode,
-              onChanged: (bool value) async {
-                themeProvider.setThemeMode(value ? ThemeMode.dark : ThemeMode.light);
-                if (authProvider.currentUser != null) {
-                  await authProvider.savePreferences({
-                    'darkMode': value,
-                    'language': languageProvider.locale.languageCode,
-                  });
+            trailing: DropdownButton<ThemeMode>(
+              value: themeProvider.themeMode,
+              onChanged: (ThemeMode? newMode) {
+                if (newMode != null) {
+                  themeProvider.setThemeMode(newMode);
                 }
               },
+              items: [
+                DropdownMenuItem(
+                  value: ThemeMode.system,
+                  child: Text(l10n.systemTheme),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.light,
+                  child: Text(l10n.lightTheme),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.dark,
+                  child: Text(l10n.darkTheme),
+                ),
+              ],
             ),
           ),
           ListTile(
             title: Text(l10n.language),
             trailing: DropdownButton<String>(
               value: languageProvider.locale.languageCode,
+              onChanged: (String? newLanguage) {
+                if (newLanguage != null) {
+                  languageProvider.setLocale(Locale(newLanguage));
+                }
+              },
               items: [
                 DropdownMenuItem(
                   value: 'en',
@@ -54,38 +69,19 @@ class SettingsScreen extends StatelessWidget {
                   child: Text(l10n.kazakh),
                 ),
               ],
-              onChanged: (String? value) async {
-                if (value != null) {
-                  languageProvider.setLocale(Locale(value));
-                  if (authProvider.currentUser != null) {
-                    await authProvider.savePreferences({
-                      'darkMode': themeProvider.isDarkMode,
-                      'language': value,
-                    });
-                  }
-                }
-              },
             ),
           ),
-          if (authProvider.currentUser != null) ...[
+          if (!authProvider.isGuestMode)
             ListTile(
               title: Text(l10n.signOut),
-              trailing: const Icon(Icons.logout),
+              leading: const Icon(Icons.logout),
               onTap: () async {
                 await authProvider.signOut();
                 if (context.mounted) {
-                  Navigator.pushReplacementNamed(context, '/');
+                  Navigator.of(context).pushReplacementNamed('/');
                 }
               },
             ),
-            ListTile(
-              title: const Text('Debug Info'),
-              trailing: const Icon(Icons.bug_report),
-              onTap: () {
-                Navigator.pushNamed(context, '/debug');
-              },
-            ),
-          ],
         ],
       ),
     );

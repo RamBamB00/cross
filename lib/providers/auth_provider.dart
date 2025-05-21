@@ -1,59 +1,106 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
+import '../services/local_storage_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  User? _user;
-  bool _isLoading = false;
+  User? _currentUser;
   bool _isGuestMode = false;
+  bool _isLoading = false;
+  StreamSubscription<User?>? _authStateSubscription;
 
   AuthProvider() {
     _init();
   }
 
-  void _init() {
-    _auth.authStateChanges().listen((User? user) {
-      _user = user;
-      // Only enter guest mode if there's no user and we're not already in guest mode
-      if (user == null && !_isGuestMode) {
-        // Don't automatically enter guest mode
-        _isGuestMode = false;
-      }
-      notifyListeners();
-    });
+  @override
+  void dispose() {
+    _authStateSubscription?.cancel();
+    super.dispose();
   }
 
-  User? get currentUser => _user;
-  bool get isLoading => _isLoading;
+  User? get currentUser => _currentUser;
   bool get isGuestMode => _isGuestMode;
+  bool get isAuthenticated => _currentUser != null;
+  bool get isLoading => _isLoading;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  Future<void> enterGuestMode() async {
-    print('Entering guest mode');
-    _isGuestMode = true;
-    _user = null;  // Ensure user is null in guest mode
+  Future<void> _init() async {
+    _isLoading = true;
     notifyListeners();
-    print('Guest mode set to: $_isGuestMode');
+
+    try {
+      // Cancel any existing subscription
+      await _authStateSubscription?.cancel();
+      
+      // Set up new auth state listener
+      _authStateSubscription = _auth.authStateChanges().listen((User? user) {
+        if (!_isGuestMode) {
+          _currentUser = user;
+          notifyListeners();
+        }
+      });
+    } catch (e) {
+      print('Error in _init: $e');
+      _currentUser = null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
-  void exitGuestMode() {
-    _isGuestMode = false;
+  Future<void> enterGuestMode() async {
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      if (_currentUser != null) {
+        await _auth.signOut();
+      }
+      _currentUser = null;
+      _isGuestMode = true;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> exitGuestMode() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _isGuestMode = false;
+      // Re-initialize auth state listener
+      await _init();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> signIn(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+
     try {
-      _isLoading = true;
-      notifyListeners();
-      await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      _isGuestMode = false;
+      
+      if (userCredential.user != null) {
+        _currentUser = userCredential.user;
+        _isGuestMode = false;
+      }
+    } catch (e) {
+      _currentUser = null;
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -61,32 +108,21 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> register(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+
     try {
-      _isLoading = true;
-      notifyListeners();
-      
-      // Create user in Firebase Auth
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
       
-      // Create user document in Firestore
       if (userCredential.user != null) {
-        print('Creating user document in Firestore for: ${userCredential.user!.uid}');
-        await _firestore.collection('users').doc(userCredential.user!.uid).set({
-          'email': email,
-          'createdAt': FieldValue.serverTimestamp(),
-          'preferences': {
-            'darkMode': false,
-            'language': 'en',
-          },
-        });
-        print('User document created successfully');
+        _currentUser = userCredential.user;
         _isGuestMode = false;
       }
     } catch (e) {
-      print('Error during registration: $e');
+      _currentUser = null;
       rethrow;
     } finally {
       _isLoading = false;
@@ -95,11 +131,13 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    _isLoading = true;
+    notifyListeners();
+
     try {
-      _isLoading = true;
-      notifyListeners();
       await _auth.signOut();
-      enterGuestMode(); // Enter guest mode after signing out
+      _currentUser = null;
+      _isGuestMode = false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -107,10 +145,10 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> savePreferences(Map<String, dynamic> preferences) async {
-    if (_user != null && !_isGuestMode) {
-      print('Saving preferences for user: ${_user!.uid}');
+    if (_currentUser != null && !_isGuestMode) {
+      print('Saving preferences for user: ${_currentUser!.uid}');
       try {
-        await _firestore.collection('users').doc(_user!.uid).set({
+        await _firestore.collection('users').doc(_currentUser!.uid).set({
           'preferences': preferences,
         }, SetOptions(merge: true));
         print('Preferences saved successfully');
@@ -122,10 +160,10 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>?> getPreferences() async {
-    if (_user != null && !_isGuestMode) {
-      print('Getting preferences for user: ${_user!.uid}');
+    if (_currentUser != null && !_isGuestMode) {
+      print('Getting preferences for user: ${_currentUser!.uid}');
       try {
-        final doc = await _firestore.collection('users').doc(_user!.uid).get();
+        final doc = await _firestore.collection('users').doc(_currentUser!.uid).get();
         print('Retrieved preferences: ${doc.data()?['preferences']}');
         return doc.data()?['preferences'] as Map<String, dynamic>?;
       } catch (e) {
