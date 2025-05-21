@@ -1,0 +1,13 @@
+{
+    "bust": "Bust!",
+    "dealerBusts": "Dealer busts!",
+    "dealerWins": "Dealer wins!",
+    "youWin": "You win!",
+    "push": "Push!",
+    "dealerHand": "Dealer's hand",
+    "yourHand": "Your hand",
+    "yourValue": "Your value",
+    "hit": "Hit",
+    "stand": "Stand",
+    "newGame": "New Game"
+} 
