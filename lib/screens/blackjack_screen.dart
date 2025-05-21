@@ -97,7 +97,7 @@ class _BlackjackScreenState extends State<BlackjackScreen> {
         
         if (playerValue > 21) {
           gameOver = true;
-          message = AppLocalizations.of(context).bust;
+          message = AppLocalizations.of(context)!.bust;
         }
       });
     }
@@ -114,13 +114,13 @@ class _BlackjackScreenState extends State<BlackjackScreen> {
         int dealerValue = calculateHandValue(dealerHand);
         
         if (dealerValue > 21) {
-          message = AppLocalizations.of(context).dealerBusts;
+          message = AppLocalizations.of(context)!.dealerBusts;
         } else if (dealerValue > playerValue) {
-          message = AppLocalizations.of(context).dealerWins;
+          message = AppLocalizations.of(context)!.dealerWins;
         } else if (dealerValue < playerValue) {
-          message = AppLocalizations.of(context).youWin;
+          message = AppLocalizations.of(context)!.youWin;
         } else {
-          message = AppLocalizations.of(context).push;
+          message = AppLocalizations.of(context)!.push;
         }
         
         gameOver = true;
@@ -130,7 +130,7 @@ class _BlackjackScreenState extends State<BlackjackScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
       appBar: AppBar(
