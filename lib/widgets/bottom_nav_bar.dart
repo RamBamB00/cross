@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
-import '../providers/auth_provider.dart';
+import '../providers/auth_provider.dart' as app;
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -13,10 +13,33 @@ class BottomNavBar extends StatelessWidget {
     required this.onTap,
   });
 
+  void _showLoginRequiredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Login Required'),
+        content: const Text('Please log in to access this feature.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/');
+            },
+            child: const Text('Go to Login'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = Provider.of<app.AuthProvider>(context);
     final isGuestMode = authProvider.isGuestMode;
     
     return Column(
@@ -40,11 +63,10 @@ class BottomNavBar extends StatelessWidget {
         BottomNavigationBar(
           currentIndex: currentIndex,
           onTap: (index) {
-            if (isGuestMode) {
-              onTap(index);
+            if (isGuestMode && index == 2) {
+              _showLoginRequiredDialog(context);
               return;
             }
-            // Not guest mode: allow all
             onTap(index);
           },
           items: [
